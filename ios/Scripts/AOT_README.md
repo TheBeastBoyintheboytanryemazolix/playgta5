@@ -73,3 +73,29 @@ code-generation feasibility, not GTA gameplay.
 
 Use `aot_compile_wasmtime.sh` for an authorized private engine,
 not `wasm2c` (which cannot compile its atomic wait/notify instructions).
+
+## Compile from your own USB drive (no Actions artifact required)
+
+If you already have the authorized original `game.wasm` on a USB drive, you
+can run the Wasmtime compiler locally on a Mac with the pinned Wasmtime 49.0.2
+binary. This wrapper checks the known engine SHA-256, runs the import audit,
+and keeps its default output outside the repository. It never uploads the
+binary or AOT output to GitHub.
+
+```sh
+export WASMTIME_BIN="/absolute/path/to/wasmtime"
+bash ios/Scripts/aot_compile_local_private_engine.sh "/Volumes/YOUR_USB_PATH/game.wasm"
+```
+
+The default output is `${TMPDIR:-/tmp}/playgta5-private-aot/gta-ios.cwasm`.
+An optional second argument selects a different output path, which must remain
+outside the repository. If the file hash differs, the wrapper stops rather
+than compiling an unverified engine snapshot. If you do not have a Mac/Wasmtime
+binary, the existing GitHub workflow still needs an artifact or another
+private file-transfer method; GitHub Actions cannot directly read your USB
+drive.
+
+This is a local compile convenience, not an IPA build or gameplay fix. The
+serialized Wasmtime artifact still needs the iOS runtime, correct host imports,
+memory/thread integration, and a functioning Metal renderer before the game
+can run.
